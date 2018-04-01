@@ -1,5 +1,5 @@
 ﻿
-namespace Sms.Helpers
+namespace Texting
 {
     /// <summary>
     ///   Encoding for sending SMS.

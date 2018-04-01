@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmsHelpers", "SmsHelpers\SmsHelpers.csproj", "{531BF552-A20F-4336-9EB1-1A72FCC6CAC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmsHelpers.Test", "SmsHelpers.Test\SmsHelpers.Test.csproj", "{8D18B675-9724-490A-AD96-DDB57071387D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmsHelpers.Tests", "SmsHelpers.Test\SmsHelpers.Tests.csproj", "{8D18B675-9724-490A-AD96-DDB57071387D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

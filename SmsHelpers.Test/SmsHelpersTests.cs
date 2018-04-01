@@ -3,9 +3,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sms.Helpers;
+using Texting;
 
-namespace SmsHelpers.Test
+namespace Texting.Tests
 {
     [TestClass]
     public class SmsHelpersTests
@@ -29,7 +29,7 @@ namespace SmsHelpers.Test
 
         public SmsHelpersTests()
         {
-            SmsHelpers = new Sms.Helpers.SmsHelpers();
+            SmsHelpers = new SmsHelpers();
         }
 
         private static string GenerateRandomUnicodeString(int length)

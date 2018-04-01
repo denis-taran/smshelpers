@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Sms.Helpers
+namespace Texting
 {
     /// <inheritdoc />
     public class SmsHelpers : ISmsHelpers

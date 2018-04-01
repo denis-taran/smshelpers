@@ -1,6 +1,5 @@
-﻿using System;
-
-namespace Sms.Helpers
+﻿
+namespace Texting
 {
     /// <summary>
     ///   Utilities to work with text messages
