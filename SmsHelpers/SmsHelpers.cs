@@ -66,6 +66,11 @@ namespace Texting
         /// <inheritdoc />
         public List<string> SplitMessageWithWordWrap(string text)
         {
+            if (string.IsNullOrEmpty(text))
+            {
+                return new List<string>();
+            }
+
             var encoding = GetEncoding(text);
             var splitted = TextHelpers.SplitLinks(text).SelectMany(b => b.IsLink ? new List<TextBlock> { b } : TextHelpers.SplitString(b.Content));
             var blocks = splitted.Select(t => ToTextBlock(t.Content, encoding)).ToList();

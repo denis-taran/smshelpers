@@ -159,7 +159,7 @@ namespace Texting
 
             var lastCharLen = 1;
 
-            if (lastSurrogatePos == charCounter)
+            if (lastSurrogatePos == charCounter || lastSurrogatePos == (charCounter - 2))
             {
                 lastCharLen = 2;
             }

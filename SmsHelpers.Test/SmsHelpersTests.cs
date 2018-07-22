@@ -8,9 +8,10 @@ namespace Texting.Tests
 {
     public class SmsHelpersTests
     {
-        private const string HighSurrogate70 = "🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳";
-        private const string HighSurrogate60 = "🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳";
+        private const string HighSurrogateChars70 = "🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳";
+        private const string HighSurrogateChars60 = "🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳";
         private const string Gsm7BitBaseChars20 = "01234567890123456789";
+        private const string Gsm7BitBaseChars40 = "0123456789012345678901234567890123456789";
         private const string Gsm7BitBaseChars150 = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
         private const string Gsm7BitBaseChars90 = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
         private const string Gsm7BitGoogleLink60 = "https://www.google.com/search?s=a&gs_l=gbb-ab.3..00.1365.188";
@@ -205,13 +206,13 @@ Have a great day!
         }
 
         [Theory]
-        [InlineData(HighSurrogate70, 1)]
-        [InlineData(HighSurrogate70 + "🐳", 2)]
-        [InlineData(HighSurrogate70 + "1", 2)]
-        [InlineData(HighSurrogate70 + HighSurrogate60 + "🐳🐳", 2)]
-        [InlineData(HighSurrogate70 + HighSurrogate60 + "🐳🐳🐳", 3)]
-        [InlineData(HighSurrogate70 + HighSurrogate60 + "🐳🐳1", 3)]
-        [InlineData(HighSurrogate70 + HighSurrogate70 + HighSurrogate70 + HighSurrogate70 + HighSurrogate70, 6)]
+        [InlineData(HighSurrogateChars70, 1)]
+        [InlineData(HighSurrogateChars70 + "🐳", 2)]
+        [InlineData(HighSurrogateChars70 + "1", 2)]
+        [InlineData(HighSurrogateChars70 + HighSurrogateChars60 + "🐳🐳", 2)]
+        [InlineData(HighSurrogateChars70 + HighSurrogateChars60 + "🐳🐳🐳", 3)]
+        [InlineData(HighSurrogateChars70 + HighSurrogateChars60 + "🐳🐳1", 3)]
+        [InlineData(HighSurrogateChars70 + HighSurrogateChars70 + HighSurrogateChars70 + HighSurrogateChars70 + HighSurrogateChars70, 6)]
         public void CountSmsParts_HighSurrogateTest(string content, int expectedLength)
         {
             var length = SmsHelpers.CountSmsParts(content);
@@ -219,11 +220,11 @@ Have a great day!
         }
 
         [Theory]
-        [InlineData(HighSurrogate60 + "🐳🐳🐳🐳🐳🐳", "🐳")]
-        [InlineData(HighSurrogate60 + "🐳🐳🐳    🐳🐳🐳🐳", "🐳🐳🐳🐳")]
-        [InlineData(HighSurrogate60 + "🐳🐳1    🐳🐳🐳🐳", "🐳🐳🐳🐳")]
-        [InlineData("012345678901234567890123456789012345678901234567890123456789🐳  1234567890", "1234567890")]
-        [InlineData("0123456789012345678901234567890123456789🐳  " + Gsm7BitGoogleLink60 + " abc", Gsm7BitGoogleLink60 + " abc")]
+        [InlineData(HighSurrogateChars60 + "🐳🐳🐳🐳🐳🐳", "🐳")]
+        [InlineData(HighSurrogateChars60 + "🐳🐳🐳    🐳🐳🐳🐳", "🐳🐳🐳🐳")]
+        [InlineData(HighSurrogateChars60 + "🐳🐳1    🐳🐳🐳🐳", "🐳🐳🐳🐳")]
+        [InlineData(Gsm7BitBaseChars40 + "01234567890123456789🐳  1234567890", "1234567890")]
+        [InlineData(Gsm7BitBaseChars40 + "🐳  " + Gsm7BitGoogleLink60 + " abc", Gsm7BitGoogleLink60 + " abc")]
         public void SplitMessage_TwoPartsTest(string message, string expectedSecondMessage)
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
@@ -255,6 +256,31 @@ Have a great day!
 
             Assert.Single(splitted);
             Assert.Equal(message, splitted[0]);
+        }
+
+        [Theory]
+        [InlineData(HighSurrogateChars60 + HighSurrogateChars70 + HighSurrogateChars70 + HighSurrogateChars70 + HighSurrogateChars70)]
+        [InlineData(HighSurrogateChars60 + HighSurrogateChars70 + " " + Gsm7BitGoogleLink60 + HighSurrogateChars70 + " " + HighSurrogateChars70)]
+        [InlineData(HighSurrogateChars70 + " " + HighSurrogateChars70)]
+        [InlineData(Gsm7BitGoogleLink60)]
+        [InlineData(Gsm7BitBaseChars90 + Gsm7BitBaseChars90 + Gsm7BitGoogleLink60)]
+        [InlineData(Gsm7BitBaseChars90 + " " + Gsm7BitBaseChars90 + " " + Gsm7BitGoogleLink60)]
+        public void SplitMessage_MultipartEqual(string text)
+        {
+            var splitted = SmsHelpers.SplitMessageWithWordWrap(text);
+            var combined = string.Concat(splitted);
+
+            var equal = combined.Equals(text);
+            Assert.Equal(combined, text);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void SplitMessage_Empty(string text)
+        {
+            var result = SmsHelpers.SplitMessageWithWordWrap(text);
+            Assert.Empty(result);
         }
     }
 }
