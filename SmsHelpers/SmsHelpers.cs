@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Texting
@@ -6,67 +7,6 @@ namespace Texting
     /// <inheritdoc />
     public class SmsHelpers : ISmsHelpers
     {
-        // standard GSM characters
-        private static readonly char[] GsmCharacters = {
-            '@', '£', '$', '¥', 'è', 'é', 'ù', 'ì', 'ò', 'Ç', '\n', 'Ø', 'ø', '\r', 'Å', 'å',
-            'Δ', '_', 'Φ', 'Γ', 'Λ', 'Ω', 'Π', 'Ψ', 'Σ', 'Θ', 'Ξ', '\u001b', 'Æ', 'æ', 'ß', 'É',
-            ' ', '!', '\'', '#', '¤', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?',
-            '¡', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
-            'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ä', 'Ö', 'Ñ', 'Ü', '§',
-            '¿', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
-            'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ä', 'ö', 'ñ', 'ü', 'à'
-        };
-
-        // GSM characters entensions - these characters must be prefixed with special escape character
-        private static readonly char[] GsmCharactersExtension = {
-            '\f', '^', '{', '}', '\\', '[', '~', ']', '|', '€'
-        };
-
-        // combined list of standard and extended GSM characters
-        private static readonly char[] AllGsmCharacters = GsmCharacters.Concat(GsmCharactersExtension).ToArray();
-
-        /// <summary>
-        ///   Count the number of SMS parts
-        /// </summary>
-        /// <param name="content">Text message</param>
-        /// <remarks>This method must only be called with GSM characters. Extended GSM characters are also allowed.</remarks>
-        /// <exception cref="ArgumentException">If the provided string contains non-GSM characters.</exception>
-        /// <exception cref="ArgumentNullException">If the provided string contains is null.</exception>
-        /// <returns></returns>
-        private static int CountNonUnicodeParts(string content)
-        {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
-
-            var counter = 0;
-
-            foreach(var c in content)
-            {
-                if (GsmCharacters.Contains(c))
-                {
-                    counter++;
-                }
-                else if (GsmCharactersExtension.Contains(c))
-                {
-                    counter = counter + 2;
-                }
-                else
-                {
-                    throw new ArgumentException("This method cannot be called with unicode characters.");
-                }
-            }
-
-            if (counter <= 160)
-            {
-                return 1;
-            }
-
-            return (int)Math.Ceiling(counter / 153m);
-        }
-
         /// <inheritdoc />
         public SmsEncoding GetEncoding(string text)
         {
@@ -77,7 +17,7 @@ namespace Texting
 
             foreach(var c in text)
             {
-                if (!AllGsmCharacters.Contains(c))
+                if (!SmsInternalHelper.AllGsmCharacters.Contains(c))
                 {
                     return SmsEncoding.GsmUnicode;
                 }
@@ -94,7 +34,7 @@ namespace Texting
                 throw new ArgumentNullException(nameof(text));
             }
 
-            if (text.Length <= 70)
+            if (text.Length <= SmsConstants.UnicodeLengthLimitSinglePart)
             {
                 return 1;
             }
@@ -102,9 +42,9 @@ namespace Texting
             switch (GetEncoding(text))
             {
                 case SmsEncoding.Gsm7Bit:
-                    return CountNonUnicodeParts(text);
+                    return SmsInternalHelper.CountNonUnicodeParts(text);
                 case SmsEncoding.GsmUnicode:
-                    return (int)Math.Ceiling(text.Length / 67.0);
+                    return (int)Math.Ceiling(text.Length / SmsConstants.UnicodeLengthLimitMultipart);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -121,6 +61,42 @@ namespace Texting
             text = text.Replace("\n", "\r");
 
             return text;
+        }
+
+        /// <inheritdoc />
+        public List<string> SplitMessageWithWordWrap(string text)
+        {
+            var encoding = GetEncoding(text);
+            var splitted = TextHelpers.SplitLinks(text).SelectMany(b => b.IsLink ? new List<TextBlock> { b } : TextHelpers.SplitString(b.Content));
+            var blocks = splitted.Select(t => ToTextBlock(t.Content, encoding)).ToList();
+            var builder = new SmsBuilder(blocks, encoding);
+            return builder.Parts.Select(n => n.Content).ToList();
+        }
+
+        private TextBlock ToTextBlock(string text, SmsEncoding encoding)
+        {
+            var result = new TextBlock
+            {
+                Content = text
+            };
+
+            if (encoding == SmsEncoding.GsmUnicode)
+            {
+                result.Length = text.Length;
+            }
+            else if (encoding == SmsEncoding.Gsm7Bit)
+            {
+                var counter = 0;
+
+                foreach (var c in text)
+                {
+                    counter = counter + SmsInternalHelper.GetGsmCharLength(c);
+                }
+
+                result.Length = counter;
+            }
+
+            return result;
         }
     }
 }

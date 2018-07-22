@@ -2,14 +2,19 @@
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Texting;
+using Xunit;
 
 namespace Texting.Tests
 {
-    [TestClass]
     public class SmsHelpersTests
     {
+        private const string HighSurrogate70 = "🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳";
+        private const string HighSurrogate60 = "🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳";
+        private const string Gsm7BitBaseChars20 = "01234567890123456789";
+        private const string Gsm7BitBaseChars150 = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
+        private const string Gsm7BitBaseChars90 = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
+        private const string Gsm7BitGoogleLink60 = "https://www.google.com/search?s=a&gs_l=gbb-ab.3..00.1365.188";
+
         private static readonly char[] GsmCharacters = {
             '@', '£', '$', '¥', 'è', 'é', 'ù', 'ì', 'ò', 'Ç', '\n', 'Ø', 'ø', '\r', 'Å', 'å',
             'Δ', '_', 'Φ', 'Γ', 'Λ', 'Ω', 'Π', 'Ψ', 'Σ', 'Θ', 'Ξ', '\u001b', 'Æ', 'æ', 'ß', 'É',
@@ -52,70 +57,70 @@ namespace Texting.Tests
             return result.ToString();
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void GetCharset_ThrowAnException()
         {
-            SmsHelpers.GetEncoding(null);
+            Assert.Throws<ArgumentNullException>(() => SmsHelpers.GetEncoding(null))
+
+            ;
         }
 
-        [TestMethod]
-        [DataRow("", SmsEncoding.Gsm7Bit)]
-        [DataRow("a", SmsEncoding.Gsm7Bit)]
-        [DataRow("≀", SmsEncoding.GsmUnicode)]
-        [DataRow("a≀", SmsEncoding.GsmUnicode)]
+        [Theory]
+        [InlineData("", SmsEncoding.Gsm7Bit)]
+        [InlineData("a", SmsEncoding.Gsm7Bit)]
+        [InlineData("≀", SmsEncoding.GsmUnicode)]
+        [InlineData("a≀", SmsEncoding.GsmUnicode)]
         public void GetCharset_DetectEncoding(string text, SmsEncoding expectedEncoding)
         {
             var encoding = SmsHelpers.GetEncoding(text);
-            Assert.AreEqual(encoding, expectedEncoding);
+            Assert.Equal(encoding, expectedEncoding);
         }
 
-        [TestMethod]
+        [Fact]
         public void GetCharset_DetectEncodingGsmCharacters()
         {
             foreach (var c in GsmCharacters)
             {
                 var encoding = SmsHelpers.GetEncoding(c.ToString());
-                Assert.AreEqual(encoding, SmsEncoding.Gsm7Bit);
+                Assert.Equal(SmsEncoding.Gsm7Bit, encoding);
             }
 
             foreach (var c in GsmCharactersExtension)
             {
                 var encoding = SmsHelpers.GetEncoding(c.ToString());
-                Assert.AreEqual(encoding, SmsEncoding.Gsm7Bit);
+                Assert.Equal(SmsEncoding.Gsm7Bit, encoding);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void NormalizeNewLines_ReturnsNull()
         {
-            Assert.IsNull(SmsHelpers.NormalizeNewLines(null));
+            Assert.Null(SmsHelpers.NormalizeNewLines(null));
         }
 
-        [TestMethod]
-        [DataRow("a\ra", "a\ra")]
-        [DataRow("a\r\na", "a\ra")]
-        [DataRow("a\n\ra", "a\ra")]
-        [DataRow("a\r\ra", "a\r\ra")]
-        [DataRow("a\r\n\r\na", "a\r\ra")]
-        [DataRow("a\n\r\n\ra", "a\r\ra")]
+        [Theory]
+        [InlineData("a\ra", "a\ra")]
+        [InlineData("a\r\na", "a\ra")]
+        [InlineData("a\n\ra", "a\ra")]
+        [InlineData("a\r\ra", "a\r\ra")]
+        [InlineData("a\r\n\r\na", "a\r\ra")]
+        [InlineData("a\n\r\n\ra", "a\r\ra")]
         public void NormalizeNewLines_Test(string before, string expected)
         {
             var result = SmsHelpers.NormalizeNewLines(before);
-            Assert.AreEqual(result, expected);
+            Assert.Equal(result, expected);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Fact]
         public void CountSmsParts_ThrowArgumentNullException()
         {
-            SmsHelpers.CountSmsParts(null);
+            Assert.Throws<ArgumentNullException>(() => SmsHelpers.CountSmsParts(null));
         }
 
-        [TestMethod]
-        [DataRow("", 1)]
-        [DataRow("1", 1)]
-        [DataRow(@"Dear abcde,
+        [Theory]
+        [InlineData("", 1)]
+        [InlineData("1", 1)]
+        [InlineData(@"Dear abcde,
 
 This is a reminder that you have an appointment on 24/04/2011 10:30 with ABCABCAB ABCAC at eeBBBBBBBB Court, 4444444444444444444444444444444444444444 444.
 
@@ -125,7 +130,7 @@ We appreciate your business and look forward to seeing you soon!
 
 Warm Regards,
 4444444444444444444444444444444444", 3)]
-        [DataRow(@"Hi 444444, this is a quick reminder that you have an
+        [InlineData(@"Hi 444444, this is a quick reminder that you have an
 appointment with 444444444444444444 on 4/44/2015 1:54 PM.
 
 If you would like to reschedule this appointment please call/ text 444444444444.
@@ -138,10 +143,10 @@ Have a great day!
         public void CountSmsParts_Test(string sms, int expectedSmsParts)
         {
             var normalized = SmsHelpers.NormalizeNewLines(sms);
-            Assert.IsTrue(SmsHelpers.CountSmsParts(normalized) == expectedSmsParts);
+            Assert.True(SmsHelpers.CountSmsParts(normalized) == expectedSmsParts);
         }
 
-        [TestMethod]
+        [Fact]
         public void CountSmsParts_NoExceptions()
         {
             for (var i = 0; i < 100; i++)
@@ -155,7 +160,7 @@ Have a great day!
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CountSmsParts_7BitTest()
         {
             for (var i = 1; i < 1100; i++)
@@ -174,29 +179,82 @@ Have a great day!
 
                 var parts = SmsHelpers.CountSmsParts(generated.ToString());
 
-                Assert.AreEqual(parts, expectedNumOfParts);
+                Assert.Equal(parts, expectedNumOfParts);
             }
         }
 
-        [TestMethod]
-        [DataRow('≀')]
-        [DataRow('←')]
+        [Theory]
+        [InlineData('≀')]
+        [InlineData('←')]
         public void CountSmsParts_UnicodeCharTest(char c)
         {
             var message = new string(c, 69);
-            Assert.AreEqual(SmsHelpers.CountSmsParts(message), 1);
+            Assert.Equal(1, SmsHelpers.CountSmsParts(message));
 
             message = new string(c, 70);
-            Assert.AreEqual(SmsHelpers.CountSmsParts(message), 1);
+            Assert.Equal(1, SmsHelpers.CountSmsParts(message));
 
             message = new string(c, 71);
-            Assert.AreEqual(SmsHelpers.CountSmsParts(message), 2);
+            Assert.Equal(2, SmsHelpers.CountSmsParts(message));
 
             message = new string(c, 134);
-            Assert.AreEqual(SmsHelpers.CountSmsParts(message), 2);
+            Assert.Equal(2, SmsHelpers.CountSmsParts(message));
 
             message = new string(c, 135);
-            Assert.AreEqual(SmsHelpers.CountSmsParts(message), 3);
+            Assert.Equal(3, SmsHelpers.CountSmsParts(message));
+        }
+
+        [Theory]
+        [InlineData(HighSurrogate70, 1)]
+        [InlineData(HighSurrogate70 + "🐳", 2)]
+        [InlineData(HighSurrogate70 + "1", 2)]
+        [InlineData(HighSurrogate70 + HighSurrogate60 + "🐳🐳", 2)]
+        [InlineData(HighSurrogate70 + HighSurrogate60 + "🐳🐳🐳", 3)]
+        [InlineData(HighSurrogate70 + HighSurrogate60 + "🐳🐳1", 3)]
+        [InlineData(HighSurrogate70 + HighSurrogate70 + HighSurrogate70 + HighSurrogate70 + HighSurrogate70, 6)]
+        public void CountSmsParts_HighSurrogateTest(string content, int expectedLength)
+        {
+            var length = SmsHelpers.CountSmsParts(content);
+            Assert.Equal(expectedLength, length);
+        }
+
+        [Theory]
+        [InlineData(HighSurrogate60 + "🐳🐳🐳🐳🐳🐳", "🐳")]
+        [InlineData(HighSurrogate60 + "🐳🐳🐳    🐳🐳🐳🐳", "🐳🐳🐳🐳")]
+        [InlineData(HighSurrogate60 + "🐳🐳1    🐳🐳🐳🐳", "🐳🐳🐳🐳")]
+        [InlineData("012345678901234567890123456789012345678901234567890123456789🐳  1234567890", "1234567890")]
+        [InlineData("0123456789012345678901234567890123456789🐳  " + Gsm7BitGoogleLink60 + " abc", Gsm7BitGoogleLink60 + " abc")]
+        public void SplitMessage_TwoPartsTest(string message, string expectedSecondMessage)
+        {
+            var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
+
+            Assert.Equal(2, splitted.Count);
+            Assert.Equal(expectedSecondMessage, splitted[1]);
+        }
+
+        [Theory]
+        [InlineData(Gsm7BitBaseChars150 + "€ 12345678", "12345678")]
+        [InlineData(Gsm7BitBaseChars150 + "01 12345678", "12345678")]
+        [InlineData(Gsm7BitBaseChars90 + Gsm7BitBaseChars20 + " " + Gsm7BitGoogleLink60, Gsm7BitGoogleLink60)]
+        public void SplitMessage_TwoParts7BitGsmTest(string message, string expectedSecondMessage)
+        {
+            var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
+
+            Assert.Equal(2, splitted.Count);
+            Assert.Equal(expectedSecondMessage, splitted[1]);
+        }
+
+        [Theory]
+        [InlineData(Gsm7BitBaseChars150 + "0123456789")]
+        [InlineData(Gsm7BitBaseChars150 + "€€€€€")]
+        [InlineData(Gsm7BitBaseChars90 + Gsm7BitGoogleLink60)]
+        [InlineData(Gsm7BitGoogleLink60)]
+        public void SplitMessage_SinglePart7BitGsmTest(string message)
+        {
+            var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
+
+            Assert.Single(splitted);
+            Assert.Equal(message, splitted[0]);
         }
     }
 }

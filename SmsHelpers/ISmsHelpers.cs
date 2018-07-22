@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace Texting
 {
     /// <summary>
@@ -29,5 +31,12 @@ namespace Texting
         /// <remarks>Before sending a text message (SMS), it is recommended to normalize new line characters and only send \r without \n</remarks>
         /// <returns>New string with normalized new line character.</returns>
         string NormalizeNewLines(string text);
+
+        /// <summary>
+        ///   Split the provided message to separate SMS parts. When possible, word wrap will be used to avoid splitting words.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        List<string> SplitMessageWithWordWrap(string text);
     }
 }
