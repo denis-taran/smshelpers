@@ -264,6 +264,8 @@ Have a great day!
         [InlineData(HighSurrogateChars70 + " " + HighSurrogateChars70)]
         [InlineData(Gsm7BitGoogleLink60)]
         [InlineData(Gsm7BitBaseChars90 + Gsm7BitBaseChars90 + Gsm7BitGoogleLink60)]
+        [InlineData(Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + Gsm7BitBaseChars150)]
+        [InlineData(Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + "🐳")]
         [InlineData(Gsm7BitBaseChars90 + " " + Gsm7BitBaseChars90 + " " + Gsm7BitGoogleLink60)]
         public void SplitMessage_MultipartEqual(string text)
         {

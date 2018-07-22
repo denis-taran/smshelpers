@@ -39,10 +39,12 @@ namespace Texting
 
                 AddContentRecursive(block.Content, lengthLimit);
 
-                if (lengthLimit == SmsConstants.GsmLengthLimitSinglePart && Parts.Count > 1)
+                var moreThanOnePart = Parts.Count > 1 || Parts.Count == 1 && CurrentPartLength > 0;
+
+                if (lengthLimit == SmsConstants.GsmLengthLimitSinglePart && moreThanOnePart)
                 {
                     Clear();
-                    AddUnicode(blocks, (int)SmsConstants.GsmLengthLimitMultipart);
+                    AddGsm(blocks, (int)SmsConstants.GsmLengthLimitMultipart);
                     return;
                 }
             }
@@ -127,10 +129,17 @@ namespace Texting
                 if (SmsEncoding == SmsEncoding.Gsm7Bit)
                 {
                     var charLen = SmsInternalHelper.GetGsmCharLength(c);
+
+                    if (charLen == 2)
+                    {
+                        lastSurrogatePos = index;
+                    }
+
                     if ((lengthCounter + charLen) > charsLeft)
                     {
                         break;
                     }
+
                     lengthCounter += charLen;
                     charCounter++;
                 }
@@ -164,7 +173,20 @@ namespace Texting
                 lastCharLen = 2;
             }
 
-            AddContentRecursive(content.Substring(charCounter - lastCharLen, content.Length - charCounter), lengthLimit);
+            if (lastSurrogatePos == 0)
+            {
+                lastCharLen = 0;
+            }
+
+            if (SmsEncoding == SmsEncoding.Gsm7Bit)
+            {
+                AddContentRecursive(content.Substring(charCounter, content.Length - charCounter), lengthLimit);
+            }
+            else
+            {
+                AddContentRecursive(content.Substring(charCounter - lastCharLen, content.Length - charCounter), lengthLimit);
+            }
+
         }
     }
 }
