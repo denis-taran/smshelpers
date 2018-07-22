@@ -6,13 +6,13 @@ namespace Texting
     internal class SmsBuilder
     {
         public List<SmsPart> Parts = new List<SmsPart>();
-        private string CurrentPart = "";
-        private int CurrentPartLength = 0;
-        private readonly SmsEncoding SmsEncoding;
+        private string _currentPart = "";
+        private int _currentPartLength;
+        private readonly SmsEncoding _smsEncoding;
 
         public SmsBuilder(List<TextBlock> blocks, SmsEncoding encoding)
         {
-            SmsEncoding = encoding;
+            _smsEncoding = encoding;
 
             switch (encoding)
             {
@@ -32,14 +32,14 @@ namespace Texting
             foreach (var block in blocks)
             {
                 // need to move the current block to the next sms part, because it will not fit
-                if ((block.Length + CurrentPartLength) > lengthLimit && block.Length <= lengthLimit)
+                if ((block.Length + _currentPartLength) > lengthLimit && block.Length <= lengthLimit)
                 {
                     MoveCurrentToNewPart();
                 }
 
                 AddContentRecursive(block.Content, lengthLimit);
 
-                var moreThanOnePart = Parts.Count > 1 || Parts.Count == 1 && CurrentPartLength > 0;
+                var moreThanOnePart = Parts.Count > 1 || Parts.Count == 1 && _currentPartLength > 0;
 
                 if (lengthLimit == SmsConstants.GsmLengthLimitSinglePart && moreThanOnePart)
                 {
@@ -49,7 +49,7 @@ namespace Texting
                 }
             }
 
-            if (CurrentPartLength > 0)
+            if (_currentPartLength > 0)
             {
                 MoveCurrentToNewPart();
             }
@@ -60,7 +60,7 @@ namespace Texting
             foreach (var block in blocks)
             {
                 // need to move the current block to the next sms part, because it will not fit
-                if ((block.Length + CurrentPartLength) > lengthLimit && block.Length <= lengthLimit)
+                if ((block.Length + _currentPartLength) > lengthLimit && block.Length <= lengthLimit)
                 {
                     MoveCurrentToNewPart();
                 }
@@ -75,7 +75,7 @@ namespace Texting
                 }
             }
 
-            if (CurrentPartLength > 0)
+            if (_currentPartLength > 0)
             {
                 MoveCurrentToNewPart();
             }
@@ -84,22 +84,22 @@ namespace Texting
         private void Clear()
         {
             Parts = new List<SmsPart>();
-            CurrentPartLength = 0;
-            CurrentPart = "";
+            _currentPartLength = 0;
+            _currentPart = "";
         }
 
         private void MoveCurrentToNewPart()
         {
             var part = new SmsPart
             {
-                Length = CurrentPartLength,
-                Content = CurrentPart
+                Length = _currentPartLength,
+                Content = _currentPart
             };
 
             Parts.Add(part);
 
-            CurrentPart = "";
-            CurrentPartLength = 0;
+            _currentPart = "";
+            _currentPartLength = 0;
         }
 
         private void AddContentRecursive(string content, int lengthLimit)
@@ -109,7 +109,7 @@ namespace Texting
                 return;
             }
 
-            var charsLeft = lengthLimit - CurrentPartLength;
+            var charsLeft = lengthLimit - _currentPartLength;
 
             if (charsLeft <= 0)
             {
@@ -119,14 +119,14 @@ namespace Texting
 
             var charCounter = 0;
             var lengthCounter = 0;
-            var index = 0;
+            int index;
             var lastSurrogatePos = 0;
 
             for (index = 0; index < content.Length && lengthCounter <= charsLeft; index++)
             {
                 var c = content[index];
 
-                if (SmsEncoding == SmsEncoding.Gsm7Bit)
+                if (_smsEncoding == SmsEncoding.Gsm7Bit)
                 {
                     var charLen = SmsInternalHelper.GetGsmCharLength(c);
 
@@ -135,7 +135,7 @@ namespace Texting
                         lastSurrogatePos = index;
                     }
 
-                    if ((lengthCounter + charLen) > charsLeft)
+                    if (lengthCounter + charLen > charsLeft)
                     {
                         break;
                     }
@@ -163,8 +163,8 @@ namespace Texting
                 }
             }
 
-            CurrentPart += content.Substring(0, charCounter);
-            CurrentPartLength += lengthCounter;
+            _currentPart += content.Substring(0, charCounter);
+            _currentPartLength += lengthCounter;
 
             var lastCharLen = 1;
 
@@ -178,15 +178,10 @@ namespace Texting
                 lastCharLen = 0;
             }
 
-            if (SmsEncoding == SmsEncoding.Gsm7Bit)
-            {
-                AddContentRecursive(content.Substring(charCounter, content.Length - charCounter), lengthLimit);
-            }
-            else
-            {
-                AddContentRecursive(content.Substring(charCounter - lastCharLen, content.Length - charCounter), lengthLimit);
-            }
-
+            AddContentRecursive(
+                _smsEncoding == SmsEncoding.Gsm7Bit
+                    ? content.Substring(charCounter, content.Length - charCounter)
+                    : content.Substring(charCounter - lastCharLen, content.Length - charCounter), lengthLimit);
         }
     }
 }

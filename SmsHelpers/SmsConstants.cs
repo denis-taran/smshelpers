@@ -1,7 +1,7 @@
 ﻿
 namespace Texting
 {
-    internal class SmsConstants
+    internal static class SmsConstants
     {
         public const int GsmLengthLimitSinglePart = 160;
         public const int UnicodeLengthLimitSinglePart = 70;

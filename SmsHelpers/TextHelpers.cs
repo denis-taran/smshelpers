@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace Texting
 {
-    internal class TextHelpers
+    internal static class TextHelpers
     {
         private static readonly Regex LinkRegex = new Regex(@"\b(?:https?://|www\.)\S+\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 

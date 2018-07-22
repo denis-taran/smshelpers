@@ -16,6 +16,8 @@ namespace Texting.Tests
         private const string Gsm7BitBaseChars90 = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
         private const string Gsm7BitGoogleLink60 = "https://www.google.com/search?s=a&gs_l=gbb-ab.3..00.1365.188";
 
+        private static readonly Random RandomNum = new Random();
+
         private static readonly char[] GsmCharacters = {
             '@', '£', '$', '¥', 'è', 'é', 'ù', 'ì', 'ò', 'Ç', '\n', 'Ø', 'ø', '\r', 'Å', 'å',
             'Δ', '_', 'Φ', 'Γ', 'Λ', 'Ω', 'Π', 'Ψ', 'Σ', 'Θ', 'Ξ', '\u001b', 'Æ', 'æ', 'ß', 'É',
@@ -41,11 +43,10 @@ namespace Texting.Tests
         private static string GenerateRandomUnicodeString(int length)
         {
             var result = new StringBuilder();
-            var random = new Random();
 
             do
             {
-                var ch = (char)random.Next(short.MaxValue);
+                var ch = (char) RandomNum.Next(short.MaxValue);
                 var category = char.GetUnicodeCategory(ch);
 
                 if (category != UnicodeCategory.OtherNotAssigned && ch != '\n')
@@ -225,6 +226,7 @@ Have a great day!
         [InlineData(HighSurrogateChars60 + "🐳🐳1    🐳🐳🐳🐳", "🐳🐳🐳🐳")]
         [InlineData(Gsm7BitBaseChars40 + "01234567890123456789🐳  1234567890", "1234567890")]
         [InlineData(Gsm7BitBaseChars40 + "🐳  " + Gsm7BitGoogleLink60 + " abc", Gsm7BitGoogleLink60 + " abc")]
+        [InlineData(Gsm7BitBaseChars150 + "123ABCDEFGHIKL", "ABCDEFGHIKL")]
         public void SplitMessage_TwoPartsTest(string message, string expectedSecondMessage)
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
@@ -272,7 +274,6 @@ Have a great day!
             var splitted = SmsHelpers.SplitMessageWithWordWrap(text);
             var combined = string.Concat(splitted);
 
-            var equal = combined.Equals(text);
             Assert.Equal(combined, text);
         }
 
@@ -283,6 +284,21 @@ Have a great day!
         {
             var result = SmsHelpers.SplitMessageWithWordWrap(text);
             Assert.Empty(result);
+        }
+
+        [Fact]
+        public void SplitMessage_RandomStringsTest()
+        {
+            for (var i = 0; i < 10000; i++)
+            {
+                var randomNum = RandomNum.Next(1, 400);
+                var randomStr = GenerateRandomUnicodeString(randomNum);
+
+                var splitted = SmsHelpers.SplitMessageWithWordWrap(randomStr);
+                var combined = string.Concat(splitted);
+
+                Assert.Equal(combined, randomStr);
+            }
         }
     }
 }

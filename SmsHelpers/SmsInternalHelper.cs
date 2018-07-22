@@ -3,10 +3,10 @@ using System.Linq;
 
 namespace Texting
 {
-    internal class SmsInternalHelper
+    internal static class SmsInternalHelper
     {
         // standard GSM characters
-        public static readonly char[] GsmCharacters = {
+        private static readonly char[] GsmCharacters = {
             '@', '£', '$', '¥', 'è', 'é', 'ù', 'ì', 'ò', 'Ç', '\n', 'Ø', 'ø', '\r', 'Å', 'å',
             'Δ', '_', 'Φ', 'Γ', 'Λ', 'Ω', 'Π', 'Ψ', 'Σ', 'Θ', 'Ξ', '\u001b', 'Æ', 'æ', 'ß', 'É',
             ' ', '!', '\'', '#', '¤', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/',
@@ -18,7 +18,7 @@ namespace Texting
         };
 
         // GSM characters entensions - these characters must be prefixed with special escape character
-        public static readonly char[] GsmCharactersExtension = {
+        private static readonly char[] GsmCharactersExtension = {
             '\f', '^', '{', '}', '\\', '[', '~', ']', '|', '€'
         };
 
@@ -30,7 +30,7 @@ namespace Texting
         /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
-        public static int GetGsmCharLength(Char c)
+        public static int GetGsmCharLength(char c)
         {
             if (GsmCharacters.Contains(c))
             {

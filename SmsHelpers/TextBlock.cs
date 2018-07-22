@@ -4,7 +4,7 @@
     {
         public string Content { get; set; }
         public int Length { get; set; }
-        public bool IsLink { get; set; }
+        public bool IsLink { get; }
 
         public TextBlock()
         {
