@@ -1,4 +1,4 @@
-﻿namespace Texting
+﻿namespace Texting.Internals
 {
     internal class TextBlock
     {

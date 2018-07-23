@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Texting
+namespace Texting.Internals
 {
     internal static class SmsInternalHelper
     {

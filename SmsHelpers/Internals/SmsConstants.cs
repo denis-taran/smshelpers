@@ -1,5 +1,5 @@
 ﻿
-namespace Texting
+namespace Texting.Internals
 {
     internal static class SmsConstants
     {

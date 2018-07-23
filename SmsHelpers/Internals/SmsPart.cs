@@ -1,4 +1,4 @@
-﻿namespace Texting
+﻿namespace Texting.Internals
 {
     /// <summary>
     ///   A part of concatenated text message

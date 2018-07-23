@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Texting.Internals;
 
 namespace Texting
 {
@@ -72,13 +73,13 @@ namespace Texting
             }
 
             var encoding = GetEncoding(text);
-            var splitted = TextHelpers.SplitLinks(text).SelectMany(b => b.IsLink ? new List<TextBlock> { b } : TextHelpers.SplitString(b.Content));
+            var splitted = Splitters.SplitLinks(text).SelectMany(b => b.IsLink ? new List<TextBlock> { b } : Splitters.SplitString(b.Content));
             var blocks = splitted.Select(t => ToTextBlock(t.Content, encoding)).ToList();
             var builder = new SmsBuilder(blocks, encoding);
             return builder.Parts.Select(n => n.Content).ToList();
         }
 
-        private TextBlock ToTextBlock(string text, SmsEncoding encoding)
+        private static TextBlock ToTextBlock(string text, SmsEncoding encoding)
         {
             var result = new TextBlock
             {

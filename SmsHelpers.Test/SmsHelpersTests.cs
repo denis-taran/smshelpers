@@ -1,23 +1,12 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using Xunit;
 
 namespace Texting.Tests
 {
-    public class SmsHelpersTests
+    public class SmsHelpersTests : TestBase
     {
-        private const string HighSurrogateChars70 = "🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳";
-        private const string HighSurrogateChars60 = "🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳";
-        private const string Gsm7BitBaseChars20 = "01234567890123456789";
-        private const string Gsm7BitBaseChars40 = "0123456789012345678901234567890123456789";
-        private const string Gsm7BitBaseChars150 = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
-        private const string Gsm7BitBaseChars90 = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
-        private const string Gsm7BitGoogleLink60 = "https://www.google.com/search?s=a&gs_l=gbb-ab.3..00.1365.188";
-
-        private static readonly Random RandomNum = new Random();
-
         private static readonly char[] GsmCharacters = {
             '@', '£', '$', '¥', 'è', 'é', 'ù', 'ì', 'ò', 'Ç', '\n', 'Ø', 'ø', '\r', 'Å', 'å',
             'Δ', '_', 'Φ', 'Γ', 'Λ', 'Ω', 'Π', 'Ψ', 'Σ', 'Θ', 'Ξ', '\u001b', 'Æ', 'æ', 'ß', 'É',
@@ -33,38 +22,10 @@ namespace Texting.Tests
             '\f', '^', '{', '}', '\\', '[', '~', ']', '|', '€'
         };
 
-        private ISmsHelpers SmsHelpers { get; }
-
-        public SmsHelpersTests()
-        {
-            SmsHelpers = new SmsHelpers();
-        }
-
-        private static string GenerateRandomUnicodeString(int length)
-        {
-            var result = new StringBuilder();
-
-            do
-            {
-                var ch = (char) RandomNum.Next(short.MaxValue);
-                var category = char.GetUnicodeCategory(ch);
-
-                if (category != UnicodeCategory.OtherNotAssigned && ch != '\n')
-                {
-                    result.Append(ch);
-                }
-
-            } while (result.Length < length);
-
-            return result.ToString();
-        }
-
         [Fact]
         public void GetCharset_ThrowAnException()
         {
-            Assert.Throws<ArgumentNullException>(() => SmsHelpers.GetEncoding(null))
-
-            ;
+            Assert.Throws<ArgumentNullException>(() => SmsHelpers.GetEncoding(null));
         }
 
         [Theory]
@@ -220,85 +181,6 @@ Have a great day!
             Assert.Equal(expectedLength, length);
         }
 
-        [Theory]
-        [InlineData(HighSurrogateChars60 + "🐳🐳🐳🐳🐳🐳", "🐳")]
-        [InlineData(HighSurrogateChars60 + "🐳🐳🐳    🐳🐳🐳🐳", "🐳🐳🐳🐳")]
-        [InlineData(HighSurrogateChars60 + "🐳🐳1    🐳🐳🐳🐳", "🐳🐳🐳🐳")]
-        [InlineData(Gsm7BitBaseChars40 + "01234567890123456789🐳  1234567890", "1234567890")]
-        [InlineData(Gsm7BitBaseChars40 + "🐳  " + Gsm7BitGoogleLink60 + " abc", Gsm7BitGoogleLink60 + " abc")]
-        [InlineData(Gsm7BitBaseChars150 + "123ABCDEFGHIKL", "ABCDEFGHIKL")]
-        public void SplitMessage_TwoPartsTest(string message, string expectedSecondMessage)
-        {
-            var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
 
-            Assert.Equal(2, splitted.Count);
-            Assert.Equal(expectedSecondMessage, splitted[1]);
-        }
-
-        [Theory]
-        [InlineData(Gsm7BitBaseChars150 + "€ 12345678", "12345678")]
-        [InlineData(Gsm7BitBaseChars150 + "01 12345678", "12345678")]
-        [InlineData(Gsm7BitBaseChars90 + Gsm7BitBaseChars20 + " " + Gsm7BitGoogleLink60, Gsm7BitGoogleLink60)]
-        public void SplitMessage_TwoParts7BitGsmTest(string message, string expectedSecondMessage)
-        {
-            var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
-
-            Assert.Equal(2, splitted.Count);
-            Assert.Equal(expectedSecondMessage, splitted[1]);
-        }
-
-        [Theory]
-        [InlineData(Gsm7BitBaseChars150 + "0123456789")]
-        [InlineData(Gsm7BitBaseChars150 + "€€€€€")]
-        [InlineData(Gsm7BitBaseChars90 + Gsm7BitGoogleLink60)]
-        [InlineData(Gsm7BitGoogleLink60)]
-        public void SplitMessage_SinglePart7BitGsmTest(string message)
-        {
-            var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
-
-            Assert.Single(splitted);
-            Assert.Equal(message, splitted[0]);
-        }
-
-        [Theory]
-        [InlineData(HighSurrogateChars60 + HighSurrogateChars70 + HighSurrogateChars70 + HighSurrogateChars70 + HighSurrogateChars70)]
-        [InlineData(HighSurrogateChars60 + HighSurrogateChars70 + " " + Gsm7BitGoogleLink60 + HighSurrogateChars70 + " " + HighSurrogateChars70)]
-        [InlineData(HighSurrogateChars70 + " " + HighSurrogateChars70)]
-        [InlineData(Gsm7BitGoogleLink60)]
-        [InlineData(Gsm7BitBaseChars90 + Gsm7BitBaseChars90 + Gsm7BitGoogleLink60)]
-        [InlineData(Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + Gsm7BitBaseChars150)]
-        [InlineData(Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + "🐳")]
-        [InlineData(Gsm7BitBaseChars90 + " " + Gsm7BitBaseChars90 + " " + Gsm7BitGoogleLink60)]
-        public void SplitMessage_MultipartEqual(string text)
-        {
-            var splitted = SmsHelpers.SplitMessageWithWordWrap(text);
-            var combined = string.Concat(splitted);
-
-            Assert.Equal(combined, text);
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        public void SplitMessage_Empty(string text)
-        {
-            var result = SmsHelpers.SplitMessageWithWordWrap(text);
-            Assert.Empty(result);
-        }
-
-        [Fact]
-        public void SplitMessage_RandomStringsTest()
-        {
-            for (var i = 0; i < 10000; i++)
-            {
-                var randomNum = RandomNum.Next(1, 400);
-                var randomStr = GenerateRandomUnicodeString(randomNum);
-
-                var splitted = SmsHelpers.SplitMessageWithWordWrap(randomStr);
-                var combined = string.Concat(splitted);
-
-                Assert.Equal(combined, randomStr);
-            }
-        }
     }
 }

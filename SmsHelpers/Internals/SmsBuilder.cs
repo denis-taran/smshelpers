@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Texting
+namespace Texting.Internals
 {
     internal class SmsBuilder
     {
@@ -133,6 +133,11 @@ namespace Texting
                     if (charLen == 2)
                     {
                         lastSurrogatePos = index;
+                        if (charsLeft == 1)
+                        {
+                            MoveCurrentToNewPart();
+                            charsLeft = lengthLimit;
+                        }
                     }
 
                     if (lengthCounter + charLen > charsLeft)
