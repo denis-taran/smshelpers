@@ -34,10 +34,10 @@ namespace Texting
         string NormalizeNewLines(string text);
 
         /// <summary>
-        ///   Split the provided message to separate SMS parts. When possible, word wrap will be used to avoid splitting words.
+        ///   Split the provided message to separate SMS parts. When possible, word wrap will be used to avoid splitting words and URLs.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        List<string> SplitMessageWithWordWrap(string text);
+        SmsSplittingResult SplitMessageWithWordWrap(string text);
     }
 }

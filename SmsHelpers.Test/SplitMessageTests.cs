@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Linq;
+using Xunit;
 
 namespace Texting.Tests
 {
@@ -15,8 +16,8 @@ namespace Texting.Tests
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
 
-            Assert.Equal(2, splitted.Count);
-            Assert.Equal(expectedSecondMessage, splitted[1]);
+            Assert.Equal(2, splitted.Parts.Count);
+            Assert.Equal(expectedSecondMessage, splitted.Parts[1].Content);
         }
 
         [Theory]
@@ -28,8 +29,8 @@ namespace Texting.Tests
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
 
-            Assert.Single(splitted);
-            Assert.Equal(message, splitted[0]);
+            Assert.Single(splitted.Parts);
+            Assert.Equal(message, splitted.Parts[0].Content);
         }
 
         [Theory]
@@ -39,8 +40,8 @@ namespace Texting.Tests
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
 
-            Assert.Single(splitted);
-            Assert.Equal(message, splitted[0]);
+            Assert.Single(splitted.Parts);
+            Assert.Equal(message, splitted.Parts[0].Content);
         }
 
         [Theory]
@@ -50,8 +51,8 @@ namespace Texting.Tests
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
 
-            Assert.True(splitted.Count == 2);
-            Assert.Equal(expectedSecondPart, splitted[1]);
+            Assert.True(splitted.Parts.Count == 2);
+            Assert.Equal(expectedSecondPart, splitted.Parts[1].Content);
         }
 
         [Theory]
@@ -66,7 +67,7 @@ namespace Texting.Tests
         public void SplitMessage_MultipartEqual(string text)
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(text);
-            var combined = string.Concat(splitted);
+            var combined = string.Concat(splitted.Parts.Select(part => part.Content));
 
             Assert.Equal(combined, text);
         }
@@ -77,7 +78,7 @@ namespace Texting.Tests
         public void SplitMessage_Empty(string text)
         {
             var result = SmsHelpers.SplitMessageWithWordWrap(text);
-            Assert.Empty(result);
+            Assert.Empty(result.Parts);
         }
 
         [Fact]
@@ -89,7 +90,7 @@ namespace Texting.Tests
                 var randomStr = GenerateRandomUnicodeString(randomNum);
 
                 var splitted = SmsHelpers.SplitMessageWithWordWrap(randomStr);
-                var combined = string.Concat(splitted);
+                var combined = string.Concat(splitted.Parts.Select(part => part.Content));
 
                 Assert.Equal(combined, randomStr);
             }
@@ -106,8 +107,8 @@ namespace Texting.Tests
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
 
-            Assert.True(splitted.Count == 2);
-            Assert.Equal(expectedSecondPart, splitted[1]);
+            Assert.True(splitted.Parts.Count == 2);
+            Assert.Equal(expectedSecondPart, splitted.Parts[1].Content);
         }
 
         [Theory]
@@ -118,8 +119,8 @@ namespace Texting.Tests
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
 
-            Assert.True(splitted.Count == 3);
-            Assert.Equal(expectedThirdPart, splitted[2]);
+            Assert.True(splitted.Parts.Count == 3);
+            Assert.Equal(expectedThirdPart, splitted.Parts[2].Content);
         }
 
         [Theory]
@@ -133,13 +134,13 @@ namespace Texting.Tests
 
             if (expectedSecondPart == null)
             {
-                Assert.Single(splitted);
-                Assert.Equal(message, splitted[0]);
+                Assert.Single(splitted.Parts);
+                Assert.Equal(message, splitted.Parts[0].Content);
             }
             else
             {
-                Assert.True(splitted.Count == 2);
-                Assert.Equal(expectedSecondPart, splitted[1]);
+                Assert.True(splitted.Parts.Count == 2);
+                Assert.Equal(expectedSecondPart, splitted.Parts[1].Content);
             }
         }
 
@@ -151,8 +152,8 @@ namespace Texting.Tests
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
 
-            Assert.True(splitted.Count == 2);
-            Assert.Equal(expectedSecondPart, splitted[1]);
+            Assert.True(splitted.Parts.Count == 2);
+            Assert.Equal(expectedSecondPart, splitted.Parts[1].Content);
         }
 
         [Theory]
@@ -163,8 +164,8 @@ namespace Texting.Tests
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
 
-            Assert.True(splitted.Count == 2);
-            Assert.Equal(expectedSecondPart, splitted[1]);
+            Assert.True(splitted.Parts.Count == 2);
+            Assert.Equal(expectedSecondPart, splitted.Parts[1].Content);
         }
     }
 }
