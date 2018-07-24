@@ -77,8 +77,12 @@ namespace Texting
             }
 
             var encoding = GetEncoding(text);
-            var splitted = Splitters.SplitLinks(text).SelectMany(b => b.IsLink ? new List<TextBlock> { b } : Splitters.SplitString(b.Content));
-            var blocks = splitted.Select(t => ToTextBlock(t.Content, encoding)).ToList();
+            var blocks = Splitters
+                .SplitLinks(text)
+                .SelectMany(b => b.IsLink ? new List<TextBlock> { b } : Splitters.SplitString(b.Content))
+                .Select(t => ToTextBlock(t.Content, encoding))
+                .ToList();
+
             var builder = new SmsBuilder(blocks, encoding);
             return new SmsSplittingResult
             {
