@@ -20,18 +20,6 @@ namespace Texting.Tests
         }
 
         [Theory]
-        [InlineData(Gsm7BitBaseChars150 + "€ 12345678", "12345678")]
-        [InlineData(Gsm7BitBaseChars150 + "01 12345678", "12345678")]
-        [InlineData(Gsm7BitBaseChars90 + Gsm7BitBaseChars20 + " " + Gsm7BitGoogleLink60, Gsm7BitGoogleLink60)]
-        public void SplitMessage_TwoParts7BitGsmTest(string message, string expectedSecondMessage)
-        {
-            var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
-
-            Assert.Equal(2, splitted.Count);
-            Assert.Equal(expectedSecondMessage, splitted[1]);
-        }
-
-        [Theory]
         [InlineData(Gsm7BitBaseChars150 + "0123456789")]
         [InlineData(Gsm7BitBaseChars150 + "€€€€€")]
         [InlineData(Gsm7BitBaseChars90 + Gsm7BitGoogleLink60)]
@@ -42,6 +30,28 @@ namespace Texting.Tests
 
             Assert.Single(splitted);
             Assert.Equal(message, splitted[0]);
+        }
+
+        [Theory]
+        [InlineData(Gsm7BitBaseChars60 + "юююююююююю")]
+        [InlineData(Gsm7BitBaseChars60 + " ююююююююю")]
+        public void SplitMessage_SinglePartUnicodeTest(string message)
+        {
+            var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
+
+            Assert.Single(splitted);
+            Assert.Equal(message, splitted[0]);
+        }
+
+        [Theory]
+        [InlineData(Gsm7BitBaseChars60 + "ююююююююююю", "юююю")]
+        //[InlineData(Gsm7BitBaseChars60 + " юююююююююю", "юююююююююю")]
+        public void SplitMessage_TwoPartsUnicodeTest(string message, string expectedSecondPart)
+        {
+            var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
+
+            Assert.True(splitted.Count == 2);
+            Assert.Equal(expectedSecondPart, splitted[1]);
         }
 
         [Theory]
@@ -89,6 +99,9 @@ namespace Texting.Tests
         [InlineData(Gsm7BitBaseChars150 + "123~ABCDEFGH", "~ABCDEFGH")]
         [InlineData(Gsm7BitBaseChars150 + "12~ABCDEFGH", "~ABCDEFGH")]
         [InlineData(Gsm7BitBaseChars150 + "1~ABCDEFGHIJ", "ABCDEFGHIJ")]
+        [InlineData(Gsm7BitBaseChars150 + "€ 12345678", "12345678")]
+        [InlineData(Gsm7BitBaseChars150 + "01 12345678", "12345678")]
+        [InlineData(Gsm7BitBaseChars90 + Gsm7BitBaseChars20 + " " + Gsm7BitGoogleLink60, Gsm7BitGoogleLink60)]
         public void SplitMessage_GsmCharactersExtensionTwoPartTest(string message, string expectedSecondPart)
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
@@ -114,7 +127,6 @@ namespace Texting.Tests
         [InlineData(Gsm7BitBaseChars150 + "€ €123456", "€123456")]
         [InlineData(Gsm7BitBaseChars150 + "€ €12345", null)]
         [InlineData(Gsm7BitBaseChars150 + "€ € € € €", "€ € € €")]
-        [InlineData(Gsm7BitBaseChars150 + " www.abc.com", "www.abc.com")]
         public void SplitMessage_GsmCharactersExtensionTests(string message, string expectedSecondPart)
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);

@@ -10,6 +10,7 @@ namespace Texting.Tests
         protected const string HighSurrogateChars60 = "🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳";
         protected const string Gsm7BitBaseChars20 = "01234567890123456789";
         protected const string Gsm7BitBaseChars40 = "0123456789012345678901234567890123456789";
+        protected const string Gsm7BitBaseChars60 = "012345678901234567890123456789012345678901234567890123456789";
         protected const string Gsm7BitBaseChars150 = "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
         protected const string Gsm7BitBaseChars90 = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789";
         protected const string Gsm7BitGoogleLink60 = "https://www.google.com/search?s=a&gs_l=gbb-ab.3..00.1365.188";

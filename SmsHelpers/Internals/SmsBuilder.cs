@@ -60,7 +60,7 @@ namespace Texting.Internals
             foreach (var block in blocks)
             {
                 // need to move the current block to the next sms part, because it will not fit
-                if ((block.Length + _currentPartLength) > lengthLimit && block.Length <= lengthLimit)
+                if (block.Length + _currentPartLength > lengthLimit && block.Length <= lengthLimit)
                 {
                     MoveCurrentToNewPart();
                 }
@@ -158,7 +158,7 @@ namespace Texting.Internals
                     }
 
                     // do not break high surrogates
-                    if (isSurrogate && (lengthCounter + 1) > charsLeft)
+                    if (isSurrogate && lengthCounter + 1 > charsLeft)
                     {
                         break;
                     }
@@ -173,7 +173,7 @@ namespace Texting.Internals
 
             var lastCharLen = 1;
 
-            if (lastSurrogatePos == charCounter || lastSurrogatePos == (charCounter - 2))
+            if (lastSurrogatePos == charCounter || lastSurrogatePos == charCounter - 2)
             {
                 lastCharLen = 2;
             }

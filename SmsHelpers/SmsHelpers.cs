@@ -83,24 +83,11 @@ namespace Texting
         {
             var result = new TextBlock
             {
-                Content = text
+                Content = text,
+                Length = encoding == SmsEncoding.GsmUnicode
+                    ? text.Length
+                    : text.Select(SmsInternalHelper.GetGsmCharLength).Sum()
             };
-
-            if (encoding == SmsEncoding.GsmUnicode)
-            {
-                result.Length = text.Length;
-            }
-            else if (encoding == SmsEncoding.Gsm7Bit)
-            {
-                var counter = 0;
-
-                foreach (var c in text)
-                {
-                    counter = counter + SmsInternalHelper.GetGsmCharLength(c);
-                }
-
-                result.Length = counter;
-            }
 
             return result;
         }
