@@ -24,3 +24,9 @@ You only need to register our interface with your DI/IoC provider like this:
     var helpers = new SmsHelpers();
     var parts = helpers.NormalizeNewLines(mymessage);
 
+### How can I split SMS to multiple individual parts with word wrapping?
+
+    var helpers = new SmsHelpers();
+    var splitResult = helpers.SplitMessageWithWordWrap(mymessage);
+    var parts = splitResult.Parts;
+    var encoding = splitResult.Encoding;
