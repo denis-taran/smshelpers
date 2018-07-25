@@ -128,7 +128,6 @@ namespace Texting.Internals
             var charCounter = 0;
             var lengthCounter = 0;
             int index;
-            var lastSurrogatePos = 0;
 
             for (index = 0; index < content.Length && lengthCounter <= charsLeft; index++)
             {
@@ -140,7 +139,6 @@ namespace Texting.Internals
 
                     if (charLen == 2)
                     {
-                        lastSurrogatePos = index;
                         if (charsLeft == 1)
                         {
                             MoveCurrentToNewPart();
@@ -158,22 +156,9 @@ namespace Texting.Internals
                 }
                 else
                 {
-                    var isSurrogate = char.IsHighSurrogate(c);
+                    var isHighSurrogate = char.IsHighSurrogate(c);
 
-                    if (isSurrogate)
-                    {
-                        lastSurrogatePos = index;
-                    }
-                    else
-                    {
-                        if (index >= charsLeft)
-                        {
-                            break;
-                        }
-                    }
-
-                    // do not break high surrogates
-                    if (isSurrogate && lengthCounter + 1 >= charsLeft)
+                    if (lengthCounter + (isHighSurrogate ? 1 : 0) >= charsLeft)
                     {
                         break;
                     }
@@ -186,22 +171,7 @@ namespace Texting.Internals
             _currentPart += content.Substring(0, charCounter);
             _currentPartLength += lengthCounter;
 
-            var lastCharLen = 1;
-
-            if (lastSurrogatePos == charCounter || lastSurrogatePos == charCounter - 2)
-            {
-                lastCharLen = 2;
-            }
-
-            if (lastSurrogatePos == 0)
-            {
-                lastCharLen = 0;
-            }
-
-            AddContentRecursive(
-                _smsEncoding == SmsEncoding.Gsm7Bit
-                    ? content.Substring(charCounter, content.Length - charCounter)
-                    : content.Substring(charCounter - lastCharLen, content.Length - charCounter), lengthLimit);
+            AddContentRecursive(content.Substring(charCounter, content.Length - charCounter), lengthLimit);
         }
     }
 }
