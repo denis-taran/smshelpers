@@ -67,7 +67,9 @@ namespace Texting.Internals
 
                 AddContentRecursive(block.Content, lengthLimit);
 
-                if (lengthLimit == SmsConstants.UnicodeLengthLimitSinglePart && Parts.Count > 1)
+                var moreThanOnePart = Parts.Count > 1 || Parts.Count == 1 && _currentPartLength > 0;
+
+                if (lengthLimit == SmsConstants.UnicodeLengthLimitSinglePart && moreThanOnePart)
                 {
                     Clear();
                     AddUnicode(blocks, (int) SmsConstants.UnicodeLengthLimitMultipart);
@@ -117,6 +119,12 @@ namespace Texting.Internals
                 charsLeft = lengthLimit;
             }
 
+            if (charsLeft == 1 && char.IsHighSurrogate(content[0]))
+            {
+                MoveCurrentToNewPart();
+                charsLeft = lengthLimit;
+            }
+
             var charCounter = 0;
             var lengthCounter = 0;
             int index;
@@ -156,9 +164,16 @@ namespace Texting.Internals
                     {
                         lastSurrogatePos = index;
                     }
+                    else
+                    {
+                        if (index >= charsLeft)
+                        {
+                            break;
+                        }
+                    }
 
                     // do not break high surrogates
-                    if (isSurrogate && lengthCounter + 1 > charsLeft)
+                    if (isSurrogate && lengthCounter + 1 >= charsLeft)
                     {
                         break;
                     }

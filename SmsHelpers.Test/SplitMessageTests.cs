@@ -6,9 +6,9 @@ namespace Texting.Tests
     public class SplitMessageTests : TestBase
     {
         [Theory]
-        [InlineData(HighSurrogateChars60 + "🐳🐳🐳🐳🐳🐳", "🐳")]
-        [InlineData(HighSurrogateChars60 + "🐳🐳🐳    🐳🐳🐳🐳", "🐳🐳🐳🐳")]
-        [InlineData(HighSurrogateChars60 + "🐳🐳1    🐳🐳🐳🐳", "🐳🐳🐳🐳")]
+        [InlineData(HighSurrogateChars60 + "🐳🐳🐳🐳🐳🐳", "🐳🐳🐳")]
+        [InlineData(HighSurrogateChars60 + "🐳🐳🐳    🐳🐳🐳🐳", "   🐳🐳🐳🐳")]
+        [InlineData(HighSurrogateChars60 + "🐳🐳1    🐳🐳🐳🐳", "  🐳🐳🐳🐳")]
         [InlineData(Gsm7BitBaseChars40 + "01234567890123456789🐳  1234567890", "1234567890")]
         [InlineData(Gsm7BitBaseChars40 + "🐳  " + Gsm7BitGoogleLink60 + " abc", Gsm7BitGoogleLink60 + " abc")]
         [InlineData(Gsm7BitBaseChars150 + "123ABCDEFGHIKL", "ABCDEFGHIKL")]
