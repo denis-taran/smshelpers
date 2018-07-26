@@ -191,5 +191,29 @@ namespace Texting.Tests
             Assert.Equal(151, splitted.Parts[3].Length);
             Assert.Equal(60, splitted.Parts[4].Length);
         }
+
+        [Fact]
+        public void SplitMessage_MultipleLinksUnicodeTest()
+        {
+            const string sms = Gsm7BitGoogleLink60 + " 🐳 " + Gsm7BitBaseChars60 + " 🐳 " + Gsm7BitGoogleLink60 + " 🐳 " +
+                               Gsm7BitBaseChars60 + " 🐳 " + Gsm7BitGoogleLink60;
+
+            var splitted = SmsHelpers.SplitMessageWithWordWrap(sms);
+
+            Assert.True(splitted.Parts.Count == 5);
+            Assert.Equal(SmsEncoding.GsmUnicode, splitted.Encoding);
+
+            Assert.Equal(Gsm7BitGoogleLink60 + " 🐳 ", splitted.Parts[0].Content);
+            Assert.Equal(Gsm7BitBaseChars60 + " 🐳 ", splitted.Parts[1].Content);
+            Assert.Equal(Gsm7BitGoogleLink60 + " 🐳 ", splitted.Parts[2].Content);
+            Assert.Equal(Gsm7BitBaseChars60 + " 🐳 ", splitted.Parts[3].Content);
+            Assert.Equal(Gsm7BitGoogleLink60, splitted.Parts[4].Content);
+
+            Assert.Equal(64, splitted.Parts[0].Length);
+            Assert.Equal(64, splitted.Parts[1].Length);
+            Assert.Equal(64, splitted.Parts[2].Length);
+            Assert.Equal(64, splitted.Parts[3].Length);
+            Assert.Equal(60, splitted.Parts[4].Length);
+        }
     }
 }
