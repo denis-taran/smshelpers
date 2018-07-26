@@ -1,5 +1,8 @@
 ﻿namespace Texting.Internals
 {
+    /// <summary>
+    ///   Class to store URLs, individual words etc.
+    /// </summary>
     internal class TextBlock
     {
         public string Content { get; set; }

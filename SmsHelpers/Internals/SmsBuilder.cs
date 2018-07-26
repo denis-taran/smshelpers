@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Texting.Internals
 {
@@ -14,48 +13,14 @@ namespace Texting.Internals
         {
             _smsEncoding = encoding;
 
-            switch (encoding)
-            {
-                case SmsEncoding.Gsm7Bit:
-                    AddGsm(blocks);
-                    break;
-                case SmsEncoding.GsmUnicode:
-                    AddUnicode(blocks);
-                    break;
-                default:
-                    throw new Exception("Invalid SMS encoding");
-            }
+            var lengthLimit = encoding == SmsEncoding.Gsm7Bit
+                ? SmsConstants.GsmLengthLimitSinglePart
+                : SmsConstants.UnicodeLengthLimitSinglePart;
+
+            Add(blocks, lengthLimit);
         }
 
-        private void AddGsm(List<TextBlock> blocks, int lengthLimit = SmsConstants.GsmLengthLimitSinglePart)
-        {
-            foreach (var block in blocks)
-            {
-                // need to move the current block to the next sms part, because it will not fit
-                if ((block.Length + _currentPartLength) > lengthLimit && block.Length <= lengthLimit)
-                {
-                    MoveCurrentToNewPart();
-                }
-
-                AddContentRecursive(block.Content, lengthLimit);
-
-                var moreThanOnePart = Parts.Count > 1 || Parts.Count == 1 && _currentPartLength > 0;
-
-                if (lengthLimit == SmsConstants.GsmLengthLimitSinglePart && moreThanOnePart)
-                {
-                    Clear();
-                    AddGsm(blocks, (int)SmsConstants.GsmLengthLimitMultipart);
-                    return;
-                }
-            }
-
-            if (_currentPartLength > 0)
-            {
-                MoveCurrentToNewPart();
-            }
-        }
-
-        private void AddUnicode(List<TextBlock> blocks, int lengthLimit = SmsConstants.UnicodeLengthLimitSinglePart)
+        private void Add(List<TextBlock> blocks, int lengthLimit)
         {
             foreach (var block in blocks)
             {
@@ -67,13 +32,16 @@ namespace Texting.Internals
 
                 AddContentRecursive(block.Content, lengthLimit);
 
-                var moreThanOnePart = Parts.Count > 1 || Parts.Count == 1 && _currentPartLength > 0;
-
-                if (lengthLimit == SmsConstants.UnicodeLengthLimitSinglePart && moreThanOnePart)
+                switch (_smsEncoding)
                 {
-                    Clear();
-                    AddUnicode(blocks, (int) SmsConstants.UnicodeLengthLimitMultipart);
-                    return;
+                    case SmsEncoding.GsmUnicode when lengthLimit == SmsConstants.UnicodeLengthLimitSinglePart && IsMultipart():
+                        Clear();
+                        Add(blocks, (int)SmsConstants.UnicodeLengthLimitMultipart);
+                        return;
+                    case SmsEncoding.Gsm7Bit when lengthLimit == SmsConstants.GsmLengthLimitSinglePart && IsMultipart():
+                        Clear();
+                        Add(blocks, (int)SmsConstants.GsmLengthLimitMultipart);
+                        return;
                 }
             }
 
@@ -127,11 +95,13 @@ namespace Texting.Internals
 
             var charCounter = 0;
             var lengthCounter = 0;
-            int index;
 
-            for (index = 0; index < content.Length && lengthCounter <= charsLeft; index++)
+            foreach (var c in content)
             {
-                var c = content[index];
+                if (lengthCounter > charsLeft)
+                {
+                    break;
+                }
 
                 if (_smsEncoding == SmsEncoding.Gsm7Bit)
                 {
@@ -172,6 +142,11 @@ namespace Texting.Internals
             _currentPartLength += lengthCounter;
 
             AddContentRecursive(content.Substring(charCounter, content.Length - charCounter), lengthLimit);
+        }
+
+        private bool IsMultipart()
+        {
+            return Parts.Count > 1 || Parts.Count == 1 && _currentPartLength > 0;
         }
     }
 }
