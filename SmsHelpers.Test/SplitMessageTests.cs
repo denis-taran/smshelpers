@@ -214,5 +214,20 @@ namespace Texting.Tests
             Assert.Equal(64, splitted.Parts[3].Length);
             Assert.Equal(60, splitted.Parts[4].Length);
         }
+
+        [Theory]
+        [InlineData(Gsm7BitBaseChars150 + Gsm7BitBaseChars10, 1)]
+        [InlineData(Gsm7BitBaseChars150 + Gsm7BitBaseChars10 + "a", 2)]
+        [InlineData(Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + Gsm7BitBaseChars20, 2)]
+        [InlineData(Gsm7BitBaseChars150 + Gsm7BitBaseChars150 + Gsm7BitBaseChars20 + "a", 3)]
+        [InlineData(HighSurrogateChars70, 1)]
+        [InlineData(HighSurrogateChars70 + "a", 2)]
+        [InlineData(HighSurrogateChars70 + HighSurrogateChars70, 2)]
+        [InlineData(HighSurrogateChars70 + HighSurrogateChars70 + "a", 3)]
+        public void CountSmsParts_NotConcatenatedMessage(string content, int expectedNumberOfParts)
+        {
+            var result = SmsHelpers.SplitMessageWithWordWrap(content, false);
+            Assert.Equal(expectedNumberOfParts, result.Parts.Count);
+        }
     }
 }

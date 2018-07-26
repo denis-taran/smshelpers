@@ -8,10 +8,12 @@ namespace Texting.Internals
         private string _currentPart = "";
         private int _currentPartLength;
         private readonly SmsEncoding _smsEncoding;
+        private readonly bool _concatenatedSms;
 
-        public SmsBuilder(List<TextBlock> blocks, SmsEncoding encoding)
+        public SmsBuilder(List<TextBlock> blocks, SmsEncoding encoding, bool concatenatedSms)
         {
             _smsEncoding = encoding;
+            _concatenatedSms = concatenatedSms;
 
             var lengthLimit = encoding == SmsEncoding.Gsm7Bit
                 ? SmsConstants.GsmLengthLimitSinglePart
@@ -34,11 +36,11 @@ namespace Texting.Internals
 
                 switch (_smsEncoding)
                 {
-                    case SmsEncoding.GsmUnicode when lengthLimit == SmsConstants.UnicodeLengthLimitSinglePart && IsMultipart():
+                    case SmsEncoding.GsmUnicode when lengthLimit == SmsConstants.UnicodeLengthLimitSinglePart && IsMultipart() && _concatenatedSms:
                         Clear();
                         Add(blocks, (int)SmsConstants.UnicodeLengthLimitMultipart);
                         return;
-                    case SmsEncoding.Gsm7Bit when lengthLimit == SmsConstants.GsmLengthLimitSinglePart && IsMultipart():
+                    case SmsEncoding.Gsm7Bit when lengthLimit == SmsConstants.GsmLengthLimitSinglePart && IsMultipart() && _concatenatedSms:
                         Clear();
                         Add(blocks, (int)SmsConstants.GsmLengthLimitMultipart);
                         return;

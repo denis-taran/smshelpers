@@ -8,6 +8,7 @@ namespace Texting.Tests
     {
         protected const string HighSurrogateChars70 = "🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳";
         protected const string HighSurrogateChars60 = "🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳🐳";
+        protected const string Gsm7BitBaseChars10 = "0123456789";
         protected const string Gsm7BitBaseChars20 = "01234567890123456789";
         protected const string Gsm7BitBaseChars40 = "0123456789012345678901234567890123456789";
         protected const string Gsm7BitBaseChars60 = "012345678901234567890123456789012345678901234567890123456789";

@@ -65,7 +65,7 @@ namespace Texting
         }
 
         /// <inheritdoc />
-        public SmsSplittingResult SplitMessageWithWordWrap(string text)
+        public SmsSplittingResult SplitMessageWithWordWrap(string text, bool concatenatedSms = true)
         {
             if (text == null)
             {
@@ -83,7 +83,7 @@ namespace Texting
 
             var encoding = GetEncoding(text);
             var blocks = TextSplitter.Split(text, encoding);
-            var builder = new SmsBuilder(blocks, encoding);
+            var builder = new SmsBuilder(blocks, encoding, concatenatedSms);
 
             return new SmsSplittingResult
             {

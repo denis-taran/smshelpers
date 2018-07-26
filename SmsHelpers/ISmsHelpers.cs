@@ -1,6 +1,5 @@
 ﻿
 using System;
-using System.Collections.Generic;
 
 namespace Texting
 {
@@ -36,9 +35,13 @@ namespace Texting
         /// <summary>
         ///   Split the provided message to separate SMS parts. When possible, word wrap will be used to avoid splitting words and URLs.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">SMS content that must be splitted</param>
+        /// <param name="concatenatedSms">
+        ///   Set this parameter to FALSE if you want to send all SMS parts as separated non-concatenated text messages.
+        ///   This will increase the limit for each SMS part to 160/70 characters.
+        /// </param>
         /// <exception cref="ArgumentNullException">This exception will be thrown if you pass a `null` value.</exception>
         /// <returns></returns>
-        SmsSplittingResult SplitMessageWithWordWrap(string text);
+        SmsSplittingResult SplitMessageWithWordWrap(string text, bool concatenatedSms = true);
     }
 }
