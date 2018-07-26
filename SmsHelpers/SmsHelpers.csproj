@@ -5,7 +5,8 @@
     <Description>Helper library to work with SMS / text messages:
   • An SMS message part calculator with support for GSM and Unicode
   • Detect the required SMS encoding
-  • Normalize SMS</Description>
+  • Normalize SMS
+  • Split messages with word wrap</Description>
     <PackageId>sms.helpers</PackageId>
     <Authors>Denys Krasnoshchok</Authors>
     <Product>sms.helpers</Product>
@@ -14,10 +15,10 @@
     <PackageProjectUrl>https://github.com/kraaden/smshelpers</PackageProjectUrl>
     <PackageTags>sms length parts counter calculator helpers gsm unicode normalize concatenated</PackageTags>
     <PackageReleaseNotes>First release of the package</PackageReleaseNotes>
-    <Company>Xandaro</Company>
+    <Company></Company>
     <RepositoryUrl>https://github.com/kraaden/smshelpers</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.0</Version>
+    <Version>2.0.1-beta</Version>
     <RootNamespace>Texting</RootNamespace>
     <AssemblyName>Texting</AssemblyName>
   </PropertyGroup>
