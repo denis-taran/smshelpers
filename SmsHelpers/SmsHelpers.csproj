@@ -18,7 +18,7 @@
     <Company></Company>
     <RepositoryUrl>https://github.com/kraaden/smshelpers</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.1-beta</Version>
+    <Version>2.0.2-beta</Version>
     <RootNamespace>Texting</RootNamespace>
     <AssemblyName>Texting</AssemblyName>
   </PropertyGroup>
