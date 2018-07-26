@@ -167,5 +167,29 @@ namespace Texting.Tests
             Assert.True(splitted.Parts.Count == 2);
             Assert.Equal(expectedSecondPart, splitted.Parts[1].Content);
         }
+
+        [Fact]
+        public void SplitMessage_MultipleLinksTest()
+        {
+            const string sms = Gsm7BitGoogleLink60 + " " + Gsm7BitBaseChars150 + " " + Gsm7BitGoogleLink60 + " " +
+                               Gsm7BitBaseChars150 + " " + Gsm7BitGoogleLink60;
+
+            var splitted = SmsHelpers.SplitMessageWithWordWrap(sms);
+
+            Assert.True(splitted.Parts.Count == 5);
+            Assert.Equal(SmsEncoding.Gsm7Bit, splitted.Encoding);
+
+            Assert.Equal(Gsm7BitGoogleLink60 + " ", splitted.Parts[0].Content);
+            Assert.Equal(Gsm7BitBaseChars150 + " ", splitted.Parts[1].Content);
+            Assert.Equal(Gsm7BitGoogleLink60 + " ", splitted.Parts[2].Content);
+            Assert.Equal(Gsm7BitBaseChars150 + " ", splitted.Parts[3].Content);
+            Assert.Equal(Gsm7BitGoogleLink60, splitted.Parts[4].Content);
+            
+            Assert.Equal(61, splitted.Parts[0].Length);
+            Assert.Equal(151, splitted.Parts[1].Length);
+            Assert.Equal(61, splitted.Parts[2].Length);
+            Assert.Equal(151, splitted.Parts[3].Length);
+            Assert.Equal(60, splitted.Parts[4].Length);
+        }
     }
 }

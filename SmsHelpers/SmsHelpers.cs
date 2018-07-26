@@ -77,28 +77,13 @@ namespace Texting
             }
 
             var encoding = GetEncoding(text);
-            var blocks = Splitters
-                .SplitLinks(text)
-                .SelectMany(b => b.IsLink ? new List<TextBlock> { b } : Splitters.SplitString(b.Content))
-                .Select(t => ToTextBlock(t.Content, encoding))
-                .ToList();
-
+            var blocks = TextSplitter.Split(text, encoding);
             var builder = new SmsBuilder(blocks, encoding);
+
             return new SmsSplittingResult
             {
                 Encoding = encoding,
                 Parts = builder.Parts
-            };
-        }
-
-        private static TextBlock ToTextBlock(string text, SmsEncoding encoding)
-        {
-            return new TextBlock
-            {
-                Content = text,
-                Length = encoding == SmsEncoding.GsmUnicode
-                    ? text.Length
-                    : text.Select(SmsInternalHelper.GetGsmCharLength).Sum()
             };
         }
     }

@@ -74,74 +74,77 @@ namespace Texting.Internals
 
         private void AddContentRecursive(string content, int lengthLimit)
         {
-            if (string.IsNullOrEmpty(content))
+            while (true)
             {
-                return;
-            }
-
-            var charsLeft = lengthLimit - _currentPartLength;
-
-            if (charsLeft <= 0)
-            {
-                MoveCurrentToNewPart();
-                charsLeft = lengthLimit;
-            }
-
-            if (charsLeft == 1 && char.IsHighSurrogate(content[0]))
-            {
-                MoveCurrentToNewPart();
-                charsLeft = lengthLimit;
-            }
-
-            var charCounter = 0;
-            var lengthCounter = 0;
-
-            foreach (var c in content)
-            {
-                if (lengthCounter > charsLeft)
+                if (string.IsNullOrEmpty(content))
                 {
-                    break;
+                    return;
                 }
 
-                if (_smsEncoding == SmsEncoding.Gsm7Bit)
-                {
-                    var charLen = SmsInternalHelper.GetGsmCharLength(c);
+                var charsLeft = lengthLimit - _currentPartLength;
 
-                    if (charLen == 2)
+                if (charsLeft <= 0)
+                {
+                    MoveCurrentToNewPart();
+                    charsLeft = lengthLimit;
+                }
+
+                if (charsLeft == 1 && char.IsHighSurrogate(content[0]))
+                {
+                    MoveCurrentToNewPart();
+                    charsLeft = lengthLimit;
+                }
+
+                var charCounter = 0;
+                var lengthCounter = 0;
+
+                foreach (var c in content)
+                {
+                    if (lengthCounter > charsLeft)
                     {
-                        if (charsLeft == 1)
+                        break;
+                    }
+
+                    if (_smsEncoding == SmsEncoding.Gsm7Bit)
+                    {
+                        var charLen = SmsInternalHelper.GetGsmCharLength(c);
+
+                        if (charLen == 2)
                         {
-                            MoveCurrentToNewPart();
-                            charsLeft = lengthLimit;
+                            if (charsLeft == 1)
+                            {
+                                MoveCurrentToNewPart();
+                                charsLeft = lengthLimit;
+                            }
                         }
-                    }
 
-                    if (lengthCounter + charLen > charsLeft)
+                        if (lengthCounter + charLen > charsLeft)
+                        {
+                            break;
+                        }
+
+                        lengthCounter += charLen;
+                        charCounter++;
+                    }
+                    else
                     {
-                        break;
+                        var isHighSurrogate = char.IsHighSurrogate(c);
+
+                        if (lengthCounter + (isHighSurrogate ? 1 : 0) >= charsLeft)
+                        {
+                            break;
+                        }
+
+                        lengthCounter++;
+                        charCounter++;
                     }
-
-                    lengthCounter += charLen;
-                    charCounter++;
                 }
-                else
-                {
-                    var isHighSurrogate = char.IsHighSurrogate(c);
 
-                    if (lengthCounter + (isHighSurrogate ? 1 : 0) >= charsLeft)
-                    {
-                        break;
-                    }
+                _currentPart += content.Substring(0, charCounter);
+                _currentPartLength += lengthCounter;
 
-                    lengthCounter++;
-                    charCounter++;
-                }
+                content = content.Substring(charCounter, content.Length - charCounter);
             }
-
-            _currentPart += content.Substring(0, charCounter);
-            _currentPartLength += lengthCounter;
-
-            AddContentRecursive(content.Substring(charCounter, content.Length - charCounter), lengthLimit);
         }
 
         private bool IsMultipart()
