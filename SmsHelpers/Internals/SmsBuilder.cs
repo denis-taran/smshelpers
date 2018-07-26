@@ -30,7 +30,7 @@ namespace Texting.Internals
                     MoveCurrentToNewPart();
                 }
 
-                AddContentRecursive(block.Content, lengthLimit);
+                AddContent(block.Content, lengthLimit);
 
                 switch (_smsEncoding)
                 {
@@ -72,7 +72,7 @@ namespace Texting.Internals
             _currentPartLength = 0;
         }
 
-        private void AddContentRecursive(string content, int lengthLimit)
+        private void AddContent(string content, int lengthLimit)
         {
             while (true)
             {

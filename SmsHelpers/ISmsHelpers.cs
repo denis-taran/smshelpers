@@ -37,6 +37,7 @@ namespace Texting
         ///   Split the provided message to separate SMS parts. When possible, word wrap will be used to avoid splitting words and URLs.
         /// </summary>
         /// <param name="text"></param>
+        /// <exception cref="ArgumentNullException">This exception will be thrown if you pass a `null` value.</exception>
         /// <returns></returns>
         SmsSplittingResult SplitMessageWithWordWrap(string text);
     }

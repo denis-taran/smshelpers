@@ -46,7 +46,7 @@ namespace Texting.Tests
 
         [Theory]
         [InlineData(Gsm7BitBaseChars60 + "ююююююююююю", "юююю")]
-        //[InlineData(Gsm7BitBaseChars60 + " юююююююююю", "юююююююююю")]
+        [InlineData(Gsm7BitBaseChars60 + " юююююююююю", "юююююююююю")]
         public void SplitMessage_TwoPartsUnicodeTest(string message, string expectedSecondPart)
         {
             var splitted = SmsHelpers.SplitMessageWithWordWrap(message);
@@ -73,7 +73,6 @@ namespace Texting.Tests
         }
 
         [Theory]
-        [InlineData(null)]
         [InlineData("")]
         public void SplitMessage_Empty(string text)
         {

@@ -67,7 +67,12 @@ namespace Texting
         /// <inheritdoc />
         public SmsSplittingResult SplitMessageWithWordWrap(string text)
         {
-            if (string.IsNullOrEmpty(text))
+            if (text == null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            if (text == string.Empty)
             {
                 return new SmsSplittingResult
                 {
