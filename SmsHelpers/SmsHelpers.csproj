@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;netstandard1.3;net45;net46;net461</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netcoreapp2.0;netcoreapp2.1;netcoreapp2.2</TargetFrameworks>
     <Description>Helper library to work with SMS / text messages:
   • An SMS message part calculator with support for GSM and Unicode
   • Detect the required SMS encoding
@@ -18,7 +18,7 @@
     <Company></Company>
     <RepositoryUrl>https://github.com/kraaden/smshelpers</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.2-beta</Version>
+    <Version>2.1.0</Version>
     <RootNamespace>Texting</RootNamespace>
     <AssemblyName>Texting</AssemblyName>
   </PropertyGroup>

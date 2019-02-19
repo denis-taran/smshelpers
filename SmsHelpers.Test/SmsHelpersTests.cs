@@ -15,7 +15,8 @@ namespace Texting.Tests
             '¡', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
             'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Ä', 'Ö', 'Ñ', 'Ü', '§',
             '¿', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
-            'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ä', 'ö', 'ñ', 'ü', 'à'
+            'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ä', 'ö', 'ñ', 'ü', 'à',
+            '"'
         };
 
         private static readonly char[] GsmCharactersExtension = {
@@ -29,6 +30,7 @@ namespace Texting.Tests
         }
 
         [Theory]
+        [InlineData("\"", SmsEncoding.Gsm7Bit)]
         [InlineData("", SmsEncoding.Gsm7Bit)]
         [InlineData("a", SmsEncoding.Gsm7Bit)]
         [InlineData("≀", SmsEncoding.GsmUnicode)]
@@ -81,6 +83,7 @@ namespace Texting.Tests
         }
 
         [Theory]
+        [InlineData("\"", 1)]
         [InlineData("", 1)]
         [InlineData("1", 1)]
         [InlineData(@"Dear abcde,
