@@ -8,10 +8,10 @@
   • Normalize SMS
   • Split messages with word wrap</Description>
     <PackageId>sms.helpers</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Denys Krasnoshchok</Authors>
     <Product>sms.helpers</Product>
     <Copyright>Copyright 2018 - Denys Krasnoshchok</Copyright>
-    <PackageLicenseUrl>https://github.com/kraaden/smshelpers/blob/master/LICENSE.md</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/kraaden/smshelpers</PackageProjectUrl>
     <PackageTags>sms length parts counter calculator helpers gsm unicode normalize concatenated</PackageTags>
     <PackageReleaseNotes>First release of the package</PackageReleaseNotes>
@@ -22,5 +22,8 @@
     <RootNamespace>Texting</RootNamespace>
     <AssemblyName>Texting</AssemblyName>
   </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\LICENSE.md" Pack="true" PackagePath="LICENSE.md" />
+  </ItemGroup>
 
 </Project>
